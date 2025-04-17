@@ -1,21 +1,35 @@
-name: Test with Docker (Ubuntu Latest + .NET 6)
+name: Run .NET 6 Tests on Ubuntu Latest (Manual SDK Install)
 
 on: [push, pull_request]
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    container:
-      image: mcr.microsoft.com/dotnet/sdk:6.0
 
     steps:
       - uses: actions/checkout@v4
 
+      - name: Install .NET 6 SDK manually
+        run: |
+          wget https://dot.net/v1/dotnet-install.sh -O dotnet-install.sh
+          chmod +x dotnet-install.sh
+          ./dotnet-install.sh --channel 6.0
+        env:
+          DOTNET_INSTALL_DIR: $HOME/.dotnet
+
+      - name: Setup PATH for manually installed .NET
+        run: |
+          echo "DOTNET_ROOT=$HOME/.dotnet" >> $GITHUB_ENV
+          echo "$HOME/.dotnet" >> $GITHUB_PATH
+
+      - name: Verify .NET version
+        run: dotnet --info
+
       - name: Restore dependencies
-        run: dotnet restore NetStandartOnUbuntuLatestRiset.sln
+        run: dotnet restore NetStandartOnWindowsLatest.sln
 
       - name: Build
-        run: dotnet build NetStandartOnUbuntuLatestRiset.sln --configuration Release --no-restore
+        run: dotnet build NetStandartOnWindowsLatest.sln --configuration Release --no-restore
 
       - name: Run Tests
         run: dotnet test DbServicesTests/DbServicesTests.csproj --configuration Release --no-build --verbosity normal
