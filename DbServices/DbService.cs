@@ -7,14 +7,9 @@ using System.Threading.Tasks;
 
 namespace DbServices;
 
-public sealed class DbService : IDbService
+public sealed class DbService(NpgsqlDataSource dataSource) : IDbService
 {
-    private readonly NpgsqlDataSource _dataSource;
-
-    public DbService(NpgsqlDataSource dataSource)
-    {
-        _dataSource = dataSource;
-    }
+    private readonly NpgsqlDataSource _dataSource = dataSource;
 
     public async Task<Guid> DeleteAsync(User user, CancellationToken token = default)
     {
@@ -28,10 +23,10 @@ public sealed class DbService : IDbService
 
         using (var cmd = _dataSource.CreateCommand())
         {
-            cmd.CommandText = @"
-delete from t_users 
-where id = $1;
-";
+            cmd.CommandText = """
+                delete from t_users 
+                where id = $1;
+                """;
 
             cmd.Parameters.Add(new NpgsqlParameter<Guid> { Value = user.Id });
 
@@ -47,11 +42,11 @@ where id = $1;
 
         using (var cmd = _dataSource.CreateCommand())
         {
-            cmd.CommandText = @"
-select id, name
-from t_users
-where id = $1
-";
+            cmd.CommandText = """
+                select id, name
+                from t_users
+                where id = $1
+                """;
 
             cmd.Parameters.Add(new NpgsqlParameter<Guid> { Value = id });
 
@@ -71,25 +66,23 @@ where id = $1
 
     public async Task<IList<User>> GetAllUserAsync(CancellationToken token = default)
     {
-        List<User> users = new();
+        List<User> users = [];
 
         using (var cmd = _dataSource.CreateCommand())
         {
-            cmd.CommandText = @"
-select id, name
-from t_users
-";
+            cmd.CommandText = """
+                select id, name
+                from t_users
+                """;
 
-            using (var rdr = await cmd.ExecuteReaderAsync(token).ConfigureAwait(false))
+            using var rdr = await cmd.ExecuteReaderAsync(token).ConfigureAwait(false);
+            while (await rdr.ReadAsync(token).ConfigureAwait(false))
             {
-                while (await rdr.ReadAsync(token).ConfigureAwait(false))
+                users.Add(new User
                 {
-                    users.Add(new User
-                    {
-                        Id = rdr.GetGuid(0),
-                        Name = rdr.GetString(1),
-                    });
-                }
+                    Id = rdr.GetGuid(0),
+                    Name = rdr.GetString(1),
+                });
             }
         }
 
@@ -99,12 +92,12 @@ from t_users
     public async Task MigrateAsync(CancellationToken token = default)
     {
         using var cmd = _dataSource.CreateCommand();
-        cmd.CommandText = @"
-create table if not exists t_users (
-    id uuid default gen_random_uuid() primary key,
-    name text not null
-);
-";
+        cmd.CommandText = """
+                create table if not exists t_users (
+                    id uuid default gen_random_uuid() primary key,
+                    name text not null
+                );
+                """;
 
         await cmd.ExecuteNonQueryAsync(token).ConfigureAwait(false);
     }
@@ -125,10 +118,10 @@ create table if not exists t_users (
 
         using (var cmd = _dataSource.CreateCommand())
         {
-            cmd.CommandText = @"
-insert into t_users (id, name)
-values ($1, $2)
-";
+            cmd.CommandText = """
+                insert into t_users (id, name)
+                values ($1, $2)
+                """;
 
             cmd.Parameters.Add(new NpgsqlParameter<Guid> { Value = user.Id });
             cmd.Parameters.Add(new NpgsqlParameter<string> { Value = user.Name });
@@ -151,11 +144,11 @@ values ($1, $2)
 
         using (var cmd = _dataSource.CreateCommand())
         {
-            cmd.CommandText = @"
-update t_users 
-set name = $2
-where id = $1;
-";
+            cmd.CommandText = """
+                update t_users 
+                set name = $2
+                where id = $1;
+                """;
 
             cmd.Parameters.Add(new NpgsqlParameter<Guid> { Value = user.Id });
             cmd.Parameters.Add(new NpgsqlParameter<string> { Value = user.Name });
