@@ -1,4 +1,5 @@
-﻿using DbServices.Domain;
+﻿using DbServices.Connection;
+using DbServices.Domain;
 using Npgsql;
 using System;
 using System.Collections.Generic;
@@ -7,9 +8,9 @@ using System.Threading.Tasks;
 
 namespace DbServices;
 
-public sealed class DbService(NpgsqlDataSource dataSource) : IDbService
+public sealed class DbService(IAxataDataSource dataSource) : IDbService
 {
-    private readonly NpgsqlDataSource _dataSource = dataSource;
+    private readonly IAxataDataSource _dataSource = dataSource;
 
     public async Task<Guid> DeleteAsync(User user, CancellationToken token = default)
     {
@@ -21,7 +22,7 @@ public sealed class DbService(NpgsqlDataSource dataSource) : IDbService
         _ = await FindByIdAsync(user.Id, token).ConfigureAwait(false)
             ?? throw new Exception("User not found!");
 
-        using (var cmd = _dataSource.CreateCommand())
+        using (var cmd = _dataSource.DataSource.CreateCommand())
         {
             cmd.CommandText = """
                 delete from t_users 
@@ -40,7 +41,7 @@ public sealed class DbService(NpgsqlDataSource dataSource) : IDbService
     {
         User user = null;
 
-        using (var cmd = _dataSource.CreateCommand())
+        using (var cmd = _dataSource.DataSource.CreateCommand())
         {
             cmd.CommandText = """
                 select id, name
@@ -68,7 +69,7 @@ public sealed class DbService(NpgsqlDataSource dataSource) : IDbService
     {
         List<User> users = [];
 
-        using (var cmd = _dataSource.CreateCommand())
+        using (var cmd = _dataSource.DataSource.CreateCommand())
         {
             cmd.CommandText = """
                 select id, name
@@ -91,7 +92,7 @@ public sealed class DbService(NpgsqlDataSource dataSource) : IDbService
 
     public async Task MigrateAsync(CancellationToken token = default)
     {
-        using var cmd = _dataSource.CreateCommand();
+        using var cmd = _dataSource.DataSource.CreateCommand();
         cmd.CommandText = """
                 create table if not exists t_users (
                     id uuid default gen_random_uuid() primary key,
@@ -116,7 +117,7 @@ public sealed class DbService(NpgsqlDataSource dataSource) : IDbService
             throw new Exception("User already exists.");
         }
 
-        using (var cmd = _dataSource.CreateCommand())
+        using (var cmd = _dataSource.DataSource.CreateCommand())
         {
             cmd.CommandText = """
                 insert into t_users (id, name)
@@ -142,7 +143,7 @@ public sealed class DbService(NpgsqlDataSource dataSource) : IDbService
         _ = await FindByIdAsync(user.Id, cancellationToken).ConfigureAwait(false)
             ?? throw new Exception("User not found!");
 
-        using (var cmd = _dataSource.CreateCommand())
+        using (var cmd = _dataSource.DataSource.CreateCommand())
         {
             cmd.CommandText = """
                 update t_users 

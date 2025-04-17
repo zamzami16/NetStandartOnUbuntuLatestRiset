@@ -1,6 +1,6 @@
 ﻿using DbServices;
+using DbServices.Connection;
 using DbServices.Domain;
-using Npgsql;
 using NUnit.Framework;
 using Testcontainers.PostgreSql;
 using Assert = NUnit.Framework.Assert;
@@ -12,7 +12,7 @@ public class DbServiceTestContainerTests
 {
     private PostgreSqlContainer _postgresContainer;
     private DbService _service;
-    NpgsqlDataSource _dataSource;
+    IAxataDataSource _dataSource;
 
     [OneTimeSetUp]
     public async Task GlobalSetup()
@@ -28,8 +28,7 @@ public class DbServiceTestContainerTests
 
         await _postgresContainer.StartAsync();
 
-        var builder = new NpgsqlDataSourceBuilder(_postgresContainer.GetConnectionString());
-        _dataSource = builder.Build();
+        _dataSource = new PostgresDataSource(_postgresContainer.GetConnectionString());
 
         _service = new DbService(_dataSource);
         await _service.MigrateAsync();
@@ -38,7 +37,7 @@ public class DbServiceTestContainerTests
     [SetUp]
     public async Task ClearBeforeEachTest()
     {
-        using var cmd = _dataSource.CreateCommand();
+        using var cmd = _dataSource.DataSource.CreateCommand();
 
         cmd.CommandText = "DELETE FROM t_users;";
         await cmd.ExecuteNonQueryAsync();
@@ -95,7 +94,6 @@ public class DbServiceTestContainerTests
     [OneTimeTearDown]
     public async Task GlobalTeardown()
     {
-        await _dataSource.DisposeAsync();
         await _postgresContainer.DisposeAsync();
     }
 }
