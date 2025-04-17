@@ -26,10 +26,10 @@ jobs:
         run: dotnet --info
 
       - name: Restore dependencies
-        run: dotnet restore NetStandartOnWindowsLatest.sln
+        run: dotnet restore NetStandartOnUbuntuLatestRiset.sln
 
       - name: Build
-        run: dotnet build NetStandartOnWindowsLatest.sln --configuration Release --no-restore
+        run: dotnet build NetStandartOnUbuntuLatestRiset.sln --configuration Release --no-restore
 
       - name: Run Tests
         run: dotnet test DbServicesTests/DbServicesTests.csproj --configuration Release --no-build --verbosity normal
