@@ -1,35 +1,24 @@
-name: Test .NET Standard Library with .NET 6 Tests on ubuntu-latest
+name: Test on Ubuntu-latest
 
 on: [push, pull_request]
 
 jobs:
-  test:
+  build:
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install .NET 6 SDK manually
-        run: |
-          wget https://dot.net/v1/dotnet-install.sh -O dotnet-install.sh
-          chmod +x dotnet-install.sh
-          ./dotnet-install.sh --channel 6.0 --install-dir "$HOME/.dotnet"
-        env:
-          DOTNET_INSTALL_DIR: $HOME/.dotnet
-
-      - name: Set up PATH and DOTNET_ROOT
-        run: |
-          echo "DOTNET_ROOT=$HOME/.dotnet" >> $GITHUB_ENV
-          echo "$HOME/.dotnet" >> $GITHUB_PATH
-
-      - name: Show installed .NET info
-        run: $HOME/.dotnet/dotnet --info
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
 
       - name: Restore dependencies
-        run: $HOME/.dotnet/dotnet restore NetStandartOnUbuntuLatestRiset.sln
+        run: dotnet restore NetStandartOnUbuntuLatestRiset.sln
 
-      - name: Build solution
-        run: $HOME/.dotnet/dotnet build NetStandartOnUbuntuLatestRiset.sln --configuration Release --no-restore
+      - name: Build
+        run: dotnet build NetStandartOnUbuntuLatestRiset.sln --configuration Release --no-restore
 
-      - name: Run tests
-        run: $HOME/.dotnet/dotnet test DbServicesTests/DbServicesTests.csproj --configuration Release --no-build --verbosity normal
+      - name: Run Tests
+        run: dotnet test DbServicesTests/DbServicesTests.csproj --configuration Release --no-build --verbosity normal
