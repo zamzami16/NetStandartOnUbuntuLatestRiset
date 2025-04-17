@@ -1,4 +1,4 @@
-name: Run .NET 6 Tests on Ubuntu Latest (Manual SDK & Runtime)
+name: Test .NET Standard Library with .NET 6 Tests on ubuntu-latest
 
 on: [push, pull_request]
 
@@ -9,32 +9,27 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install native dependencies for .NET 6 on Ubuntu 24.04
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libicu70 libkrb5-3 zlib1g || true
-
-      - name: Install .NET 6 SDK manually (version 6.0.428)
+      - name: Install .NET 6 SDK manually
         run: |
           wget https://dot.net/v1/dotnet-install.sh -O dotnet-install.sh
           chmod +x dotnet-install.sh
-          ./dotnet-install.sh --version 6.0.428 --install-dir "$HOME/.dotnet"
+          ./dotnet-install.sh --channel 6.0 --install-dir "$HOME/.dotnet"
         env:
           DOTNET_INSTALL_DIR: $HOME/.dotnet
 
-      - name: Setup .NET CLI path
+      - name: Set up PATH and DOTNET_ROOT
         run: |
           echo "DOTNET_ROOT=$HOME/.dotnet" >> $GITHUB_ENV
           echo "$HOME/.dotnet" >> $GITHUB_PATH
 
-      - name: Verify .NET installation
+      - name: Show installed .NET info
         run: $HOME/.dotnet/dotnet --info
 
-      - name: Restore
+      - name: Restore dependencies
         run: $HOME/.dotnet/dotnet restore NetStandartOnUbuntuLatestRiset.sln
 
-      - name: Build (with verbosity)
-        run: $HOME/.dotnet/dotnet build NetStandartOnUbuntuLatestRiset.sln --configuration Release --no-restore -v minimal
+      - name: Build solution
+        run: $HOME/.dotnet/dotnet build NetStandartOnUbuntuLatestRiset.sln --configuration Release --no-restore
 
-      - name: Run Tests
-        run: $HOME/.dotnet/dotnet test DbServicesTests/DbServicesTests.csproj --no-build --configuration Release --verbosity normal
+      - name: Run tests
+        run: $HOME/.dotnet/dotnet test DbServicesTests/DbServicesTests.csproj --configuration Release --no-build --verbosity normal

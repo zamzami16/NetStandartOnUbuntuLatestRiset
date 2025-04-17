@@ -7,9 +7,14 @@ using System.Threading.Tasks;
 
 namespace DbServices;
 
-public sealed class DbService(NpgsqlDataSource dataSource) : IDbService
+public sealed class DbService : IDbService
 {
-    private readonly NpgsqlDataSource _dataSource = dataSource;
+    private readonly NpgsqlDataSource _dataSource;
+
+    public DbService(NpgsqlDataSource dataSource)
+    {
+        _dataSource = dataSource;
+    }
 
     public async Task<Guid> DeleteAsync(User user, CancellationToken token = default)
     {
@@ -23,10 +28,10 @@ public sealed class DbService(NpgsqlDataSource dataSource) : IDbService
 
         using (var cmd = _dataSource.CreateCommand())
         {
-            cmd.CommandText = """
-                delete from t_users 
-                where id = $1;
-                """;
+            cmd.CommandText = @"
+delete from t_users 
+where id = $1;
+";
 
             cmd.Parameters.Add(new NpgsqlParameter<Guid> { Value = user.Id });
 
@@ -42,11 +47,11 @@ public sealed class DbService(NpgsqlDataSource dataSource) : IDbService
 
         using (var cmd = _dataSource.CreateCommand())
         {
-            cmd.CommandText = """
-                select id, name
-                from t_users
-                where id = $1
-                """;
+            cmd.CommandText = @"
+select id, name
+from t_users
+where id = $1
+";
 
             cmd.Parameters.Add(new NpgsqlParameter<Guid> { Value = id });
 
@@ -66,14 +71,14 @@ public sealed class DbService(NpgsqlDataSource dataSource) : IDbService
 
     public async Task<IList<User>> GetAllUserAsync(CancellationToken token = default)
     {
-        List<User> users = [];
+        List<User> users = new();
 
         using (var cmd = _dataSource.CreateCommand())
         {
-            cmd.CommandText = """
-                select id, name
-                from t_users
-                """;
+            cmd.CommandText = @"
+select id, name
+from t_users
+";
 
             using (var rdr = await cmd.ExecuteReaderAsync(token).ConfigureAwait(false))
             {
@@ -94,12 +99,12 @@ public sealed class DbService(NpgsqlDataSource dataSource) : IDbService
     public async Task MigrateAsync(CancellationToken token = default)
     {
         using var cmd = _dataSource.CreateCommand();
-        cmd.CommandText = """
-                create table if not exists t_users (
-                    id uuid default gen_random_uuid() primary key,
-                    name text not null
-                );
-                """;
+        cmd.CommandText = @"
+create table if not exists t_users (
+    id uuid default gen_random_uuid() primary key,
+    name text not null
+);
+";
 
         await cmd.ExecuteNonQueryAsync(token).ConfigureAwait(false);
     }
@@ -120,10 +125,10 @@ public sealed class DbService(NpgsqlDataSource dataSource) : IDbService
 
         using (var cmd = _dataSource.CreateCommand())
         {
-            cmd.CommandText = """
-                insert into t_users (id, name)
-                values ($1, $2)
-                """;
+            cmd.CommandText = @"
+insert into t_users (id, name)
+values ($1, $2)
+";
 
             cmd.Parameters.Add(new NpgsqlParameter<Guid> { Value = user.Id });
             cmd.Parameters.Add(new NpgsqlParameter<string> { Value = user.Name });
@@ -146,11 +151,11 @@ public sealed class DbService(NpgsqlDataSource dataSource) : IDbService
 
         using (var cmd = _dataSource.CreateCommand())
         {
-            cmd.CommandText = """
-                update t_users 
-                set name = $2
-                where id = $1;
-                """;
+            cmd.CommandText = @"
+update t_users 
+set name = $2
+where id = $1;
+";
 
             cmd.Parameters.Add(new NpgsqlParameter<Guid> { Value = user.Id });
             cmd.Parameters.Add(new NpgsqlParameter<string> { Value = user.Name });
