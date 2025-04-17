@@ -1,0 +1,46 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.13.35931.197 d17.13
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DbServices", "DbServices\DbServices.csproj", "{2F04F5DC-37D1-482D-8BA5-28D156C3EE52}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DbServicesTests", "DbServicesTests\DbServicesTests.csproj", "{A09F24A9-D503-4CA3-B022-DD46AFE409BC}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionItems", "SolutionItems", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{58B7FCBE-4EB4-4C53-A77C-96EDE1C69AC5}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "wrokflows", "wrokflows", "{0B2CAB8D-A329-4B12-BC85-E0DE11E96485}"
+	ProjectSection(SolutionItems) = preProject
+		.github\workflows\ubuntu_22_04.yml = .github\workflows\ubuntu_22_04.yml
+		.github\workflows\ubuntu_latest_with_docker.yml = .github\workflows\ubuntu_latest_with_docker.yml
+		.github\workflows\ubuntu_latest_with_out_docker.yml = .github\workflows\ubuntu_latest_with_out_docker.yml
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{2F04F5DC-37D1-482D-8BA5-28D156C3EE52}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2F04F5DC-37D1-482D-8BA5-28D156C3EE52}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2F04F5DC-37D1-482D-8BA5-28D156C3EE52}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2F04F5DC-37D1-482D-8BA5-28D156C3EE52}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A09F24A9-D503-4CA3-B022-DD46AFE409BC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A09F24A9-D503-4CA3-B022-DD46AFE409BC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A09F24A9-D503-4CA3-B022-DD46AFE409BC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A09F24A9-D503-4CA3-B022-DD46AFE409BC}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{58B7FCBE-4EB4-4C53-A77C-96EDE1C69AC5} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{0B2CAB8D-A329-4B12-BC85-E0DE11E96485} = {58B7FCBE-4EB4-4C53-A77C-96EDE1C69AC5}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {0ADD4B1E-3912-4D27-9BB6-6530EB75C4FE}
+	EndGlobalSection
+EndGlobal

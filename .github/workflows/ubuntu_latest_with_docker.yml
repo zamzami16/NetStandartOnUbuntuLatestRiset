@@ -1,0 +1,21 @@
+name: Test with Docker (Ubuntu Latest + .NET 6)
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container:
+      image: mcr.microsoft.com/dotnet/sdk:6.0
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Restore dependencies
+        run: dotnet restore NetStandartOnWindowsLatest.sln
+
+      - name: Build
+        run: dotnet build NetStandartOnWindowsLatest.sln --configuration Release --no-restore
+
+      - name: Run Tests
+        run: dotnet test DbServicesTests/DbServicesTests.csproj --configuration Release --no-build --verbosity normal
