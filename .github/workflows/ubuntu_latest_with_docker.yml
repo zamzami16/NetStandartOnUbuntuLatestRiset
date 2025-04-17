@@ -1,4 +1,4 @@
-name: Run .NET 6 Tests on Ubuntu Latest (Manual SDK & Runtime + Diagnostics)
+name: Run .NET 6 Tests on Ubuntu Latest (Manual SDK & Runtime)
 
 on: [push, pull_request]
 
@@ -12,13 +12,13 @@ jobs:
       - name: Install native dependencies for .NET 6 on Ubuntu 24.04
         run: |
           sudo apt-get update
-          sudo apt-get install -y libicu70 libssl1.1 libkrb5-3 zlib1g || true
+          sudo apt-get install -y libicu70 libkrb5-3 zlib1g || true
 
-      - name: Install .NET 6 SDK manually
+      - name: Install .NET 6 SDK manually (version 6.0.428)
         run: |
           wget https://dot.net/v1/dotnet-install.sh -O dotnet-install.sh
           chmod +x dotnet-install.sh
-          ./dotnet-install.sh --channel 6.0 --install-dir "$HOME/.dotnet"
+          ./dotnet-install.sh --version 6.0.428 --install-dir "$HOME/.dotnet"
         env:
           DOTNET_INSTALL_DIR: $HOME/.dotnet
 
@@ -27,18 +27,14 @@ jobs:
           echo "DOTNET_ROOT=$HOME/.dotnet" >> $GITHUB_ENV
           echo "$HOME/.dotnet" >> $GITHUB_PATH
 
-      - name: Add global.json to lock SDK
-        run: |
-          echo '{ "sdk": { "version": "6.0.420", "rollForward": "disable" } }' > global.json
-
       - name: Verify .NET installation
         run: $HOME/.dotnet/dotnet --info
 
       - name: Restore
         run: $HOME/.dotnet/dotnet restore NetStandartOnUbuntuLatestRiset.sln
 
-      - name: Debug Build (full verbosity)
-        run: $HOME/.dotnet/dotnet build NetStandartOnUbuntuLatestRiset.sln --configuration Release --no-restore -v diag
+      - name: Build (with verbosity)
+        run: $HOME/.dotnet/dotnet build NetStandartOnUbuntuLatestRiset.sln --configuration Release --no-restore -v minimal
 
       - name: Run Tests
         run: $HOME/.dotnet/dotnet test DbServicesTests/DbServicesTests.csproj --no-build --configuration Release --verbosity normal
